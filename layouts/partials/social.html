@@ -1,7 +1,6 @@
 <ul class="social-icons">
-
-{{ range $.Site.Params.Social }}
-    {{ if and (isset $.Site.Data.social.social_icons .id) (isset . "url") }}
+{{ range $.Site.Params.Social -}}
+    {{- if and (isset $.Site.Data.social.social_icons .id) (isset . "url") -}}
         <li>
             <a {{ printf "href=%q" .url | safeHTMLAttr }} title="{{ humanize .id }}" rel="me">
             {{ partial "font-awesome.html" (dict "iconName" .id "custom" false) }}
@@ -28,10 +27,9 @@
     {{ with .Site.Home.OutputFormats.Get "rss" -}}
         <li>
             <a {{ printf "href=%q" .Permalink | safeHTMLAttr }} title="RSS" rel="me">
-            {{ partial "font-awesome.html" (dict "iconName" "rss" "custom" false) }}
+            {{- partial "font-awesome.html" (dict "iconName" "rss" "custom" false) -}}
             </a>
         </li>
     {{ end -}}
 {{ end }}
-
 </ul>

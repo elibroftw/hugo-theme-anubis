@@ -1,51 +1,36 @@
-<!-- Basic stuff -->
-<meta charset="utf-8">
-<meta name="HandheldFriendly" content="True">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="referrer" content="no-referrer-when-downgrade">
+<head>
+    <!-- PWA -->
+    {{ if fileExists "manifest.json" }}
+    <link rel="manifest" href="manifest.json" />
+    {{ end }}
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name = "apple-mobile-web-app-capable" content = "yes">
+    <meta name="theme-color" content="#121212">
 
-{{ partial "title.html" . }}
-<meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{if .IsPage}}{{ .Summary }}{{ else }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ end }}{{ end -}}">
-
-{{ with .Keywords }}
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    {{ partial "title.html" . }}
+    <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{if .IsPage}}{{ .Summary }}{{ else }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ end }}{{ end -}}">
+    {{ with .Keywords }}
     <meta name="keywords" content="{{ range $i, $e := . }}{{ if $i }},{{ end }}{{ $e }}{{ end }}">
-{{ end }}
-
-{{ if and (.IsPage) (eq .Params.hidden true)}}
-<meta name="robots" content="noindex" />
-{{ end }}
-
-{{ with .OutputFormats.Get "rss" -}}
-    {{ printf `<link rel="%s" type="%s" href="%s" title="%s" />` .Rel .MediaType.Type .Permalink $.Site.Title | safeHTML }}
-{{ end -}}
-
+    {{ end }}
+    {{- if and (.IsPage) (eq .Params.hidden true)}}
+    <meta name="robots" content="noindex" />
+    {{ end -}}
+    {{- with .OutputFormats.Get "rss" }}
+    {{- printf `<link rel="%s" type="%s" href="%s" title="%s" />` .Rel .MediaType.Type .Permalink $.Site.Title | safeHTML }}
+    {{- end }}
 {{ partial "favicons.html" . }}
 {{- $style := "dark-without-switcher" }}
 {{- if and (isset site.Params "style") (ne site.Params.style "") -}}
     {{- $style = site.Params.style | lower -}}
 {{ end }}
 
-{{ if not (in (slice "light-without-switcher" "dark-without-switcher") $style) }}
-<style>
-  body {
-    visibility: hidden;
-    opacity: 0;
-  }
-</style>
+{{- partial "resource.html" (dict "context" . "type" "css" "filename" "css/main.css") }}
 
-<noscript>
-  <style>
-    body {
-      visibility: visible;
-      opacity: 1;
-    }
-  </style>
-</noscript>
-{{end}}
-
-{{ partial "resource.html" (dict "context" . "type" "css" "filename" "css/main.css") }}
-
-{{ if .Site.Params.copyCodeButton | default true }}
+{{- if .Site.Params.copyCodeButton | default true }}
     {{ partial "resource.html" (dict "context" . "type" "js" "filename" "js/copy-code.js") }}
 {{ end }}
 
@@ -56,7 +41,7 @@
 {{ template "_internal/opengraph.html" . }}
 {{ template "_internal/twitter_cards.html" . }}
 
-{{ if isset .Site.Params "webmentions" }}
+{{- if isset .Site.Params "webmentions" }}
     {{ if isset .Site.Params.webmentions "login"  }}
         <link rel="webmention" href="https://webmention.io/{{.Site.Params.webmentions.login}}/webmention" />
         {{ if eq .Site.Params.webmentions.pingback true  }}
@@ -83,3 +68,4 @@
 {{ end }}
 
 {{ partial "head-extra.html" . }}
+</head>
