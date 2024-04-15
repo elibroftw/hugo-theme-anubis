@@ -1,12 +1,6 @@
 # Anubis Theme for Hugo [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-## ⚠️ Theme is no longer maintained
-Thank you all.  
-More info: https://mitrich.me/en/posts/anubis-closed/  
-
----
-
-Anubis is a simple minimalist theme for [Hugo blog engine](https://gohugo.io/).  
+Anubis is a simple minimalist theme for [Hugo blog engine](https://gohugo.io/).
 [Demo](https://anubis.mitrich.me)
 
 ![Anubis Screenshot](https://raw.githubusercontent.com/mitrichius/hugo-theme-anubis/master/images/screenshot.png)
@@ -32,12 +26,16 @@ Anubis is a simple minimalist theme for [Hugo blog engine](https://gohugo.io/).
 - Hidden posts (available only by link)
 - Translations (en, ru, fr, pl)
 - Custom CSS/JS
-- Multilingual mode 
-- Robots.txt 
+- Multilingual mode
+- Robots.txt
 - Favorite posts
 - Pagination on post single page
 - Optional "Read more" link
 - webmentions
+- \[Experimental] Offline support via Progressive Web App
+  - You must create `manifest.json` in your static directory
+  - ensure `themes/anubis/static` is added as a static directory
+    - `themes/anubis/static/sw.js` will cache first 50 articles and implements [stale while revalidate cache](https://web.dev/articles/offline-cookbook#stale-while-revalidate)
 
 ## Installation
 
@@ -139,12 +137,14 @@ params:
     datacache: false # optional
     url: "https://abc.example.com/umami.js" # mandatory
   graphcommentId: ""
-  # giscus support
-  GiscusRepo: "" # mandatory
-  GiscusRepoId: "" # mandatory
-  GiscusCategory: "Announcements" # mandatory
-  GiscusCategoryId: "" # mandatory
+
+  # giscus support (all mandatory) See https://giscus.app under the Configuration section
+  GiscusRepo: "elibroftw/blog.elijahlopez.ca"
+  GiscusRepoId: "R_kgDOGiL7hg"
+  GiscusCategory: "General"
+  GiscusCategoryId: "DIC_kwDOGiL7hs4Cer6e"
   GiscusLazyLoad: false # optional
+
   webmentions:
     url: https://yourdomain.com/webemntions/receive
     login: hugo-theme-anubis
@@ -156,7 +156,13 @@ params:
 #    url: "https://gohugo.io/"
 #    icon: "hugo"
 
+staticDir:
+  - static
+  - themes/anubis/static
+
 markup:
+  highlight:
+    style: native
   goldmark:
     renderer:
       unsafe: true # enable raw HTML in Markdown
@@ -178,8 +184,8 @@ Options:
 - `light-without-switcher` - light theme, without switcher (by default)
 - `dark-without-switcher` - dark theme, without switcher
 - `auto-without-switcher` - theme based on user system settings, without switcher
-- `light` - light theme by default, can be switched by user to dark theme and back. Theme settings are saved for user 
-- `dark` - dark theme by default, can be switched by user to light theme and back. Theme settings are saved for user 
+- `light` - light theme by default, can be switched by user to dark theme and back. Theme settings are saved for user
+- `dark` - dark theme by default, can be switched by user to light theme and back. Theme settings are saved for user
 - `auto` - theme based on user system settings by default, can be switched by user to dark/light theme. Theme settings are saved for user (by default in example sites)
 
 ### Table of Contents
@@ -195,7 +201,7 @@ by setting `toc` to either `true` or `false` in the front matter of a post.
 #### Predefined icons
 To add icon from predefined list, add to `params.social` config:
 - id of social network
-- name for placeholder (usually it's your nickname or login)  
+- name for placeholder (usually it's your nickname or login)
 
 Predefined list:
  - email
@@ -225,7 +231,7 @@ Config like this generate github icon with "https://github.com/gohugoio" url.
 #### Predefined icons with custom url
 To add predefined icon with custom url, add to `params.social` config:
 - id of social network
-- full url to your network  
+- full url to your network
 
 Example:
 ```
@@ -237,7 +243,7 @@ Config like this generate github icon with "https://github.com/gohugoio/hugo" ur
 #### Custom icons
 To add custom icon, add to `params.social` config:
 - id of social network/site
-- full url to your network/site  
+- full url to your network/site
 
 Also you need to create directory `static/fa-icons` and add svg icon of your network/site with name equals to `id` from config.
 
@@ -253,19 +259,19 @@ If you want font awesome icons, download "Font Awesome For Desktop" and open svg
 ### Google Analytics
 Only works for production environment.
 
-### Multilingual mode 
+### Multilingual mode
 Check config/example usage in [exampleSiteMultilingual](https://github.com/Mitrichius/hugo-theme-anubis/tree/master/exampleSiteMultilingual) directory and documentation on [Hugo site](https://gohugo.io/content-management/multilingual/).
 
-### RSS 
-RSS is available by site url + /index.xml. Also available for specific language, section, taxonomy.  
+### RSS
+RSS is available by site url + /index.xml. Also available for specific language, section, taxonomy.
 `rssAsSocialIcon` parameter enables rss social icon with link to site current language RSS.
 
 ### Robots.txt
-Based on environment.  
+Based on environment.
 For production — allow all, for other — disallow all.
 
 ### Favorite posts
-Add `favorite: true` to post front matter. It adds a "★" icon nearby post's title. 
+Add `favorite: true` to post front matter. It adds a "★" icon nearby post's title.
 
 ### Related posts (Read Next section)
 Based on `readNextPosts` config parameter. Check [this article](https://gohugo.io/content-management/related/#configure-related-content) for configuration details.
@@ -281,23 +287,27 @@ Enabled by `paginationSinglePost` param in `params` section of config.
 
 ### Webmentions
 To provide webmention support you can **either** specify your webmention.io username with `login: webmentionusername` **or** specify a link to your custom webmention endpoint with `url: https://yourdomain.com/webemntions/receive`.
-If you use webmention.io you can also enable pingback with `pingback: true` 
+If you use webmention.io you can also enable pingback with `pingback: true`
 
 ### Disabling comments per-page basis
+
 Add `disableComments: true` to post front matter.
 
+## Giscus Configuration
+
+Go to [https://giscus.app/](giscus.app) and start the configuration section. When adding the giscus app, limit it to your blog's repository.
+
+I recommend using General and not Announcements for the discussion.
+
 ## Custom shortcodes
+
 ### Video (for local videofiles)
+
 Example: `{{< video src="/media/movie.mp4" type="video/mp4" preload="auto" caption="Some caption" alt="Some alt" >}}`
 
-## Contributing
-
-If you find a bug or have an idea for a feature, feel free to write an [issue](https://github.com/mitrichius/hugo-theme-anubis/issues) or make a PR.
-
-## TODO
-See [issues](https://github.com/mitrichius/hugo-theme-anubis/issues).
 
 ## License
+
 MIT
 
 © Dmitry Kolosov
