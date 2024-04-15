@@ -34,8 +34,8 @@ Anubis is a simple minimalist theme for [Hugo blog engine](https://gohugo.io/).
 - webmentions
 - \[Experimental] Offline support via Progressive Web App
   - You must create `manifest.json` in your static directory
-  - ensure `themes/anubis/static` is added as a static directory
-    - `themes/anubis/static/sw.js` will cache first 50 articles and implements [stale while revalidate cache](https://web.dev/articles/offline-cookbook#stale-while-revalidate)
+  - You must create `index.sw.js` in your layouts directory
+  - You must add sw as a custom outputFormat in your site's `hugo.toml`
 
 ## Installation
 

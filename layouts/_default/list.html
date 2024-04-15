@@ -21,9 +21,9 @@
                         {{ partial "post-language-switcher.html" . }}
                     </header>
                 </div>
-                {{ if $showFullContent }}
+                {{- if $showFullContent }}
                     {{ .Content }}
-                {{ end }}
+                {{- end -}}
                 {{ partial "post-info.html" . }}
             </div>
         {{ end }}

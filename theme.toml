@@ -5,12 +5,12 @@ description = "A minimal Hugo theme"
 homepage = "https://github.com/mitrichius/hugo-theme-anubis"
 demosite = "https://hugo-theme-anubis.netlify.app/"
 tags = [
-    "blog", 
+    "blog",
     "responsive",
     "personal",
-    "minimal", 
+    "minimal",
     "clean",
-    "simple", 
+    "simple",
     "light",
     "dark",
     "google-analytics",
