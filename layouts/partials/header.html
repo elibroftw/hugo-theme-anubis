@@ -29,3 +29,27 @@
 {{ if .Site.Params.mathjax }}{{ partial "mathjax_support.html" . }}{{ end }}
 
 {{ partial "header-extra.html" . }}
+<!-- service worker -->
+{{ if fileExists "manifest.json" }}
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register(
+        'sw.js',
+        {
+            scope: './',
+        }
+        ).then(registration => {
+            if (registration.installing) {
+                console.log('service worker installing')
+            } else if (registration.waiting) {
+                console.log('service worker waiting')
+            } else if (registration.active) {
+                console.log('service worker active')
+            }
+            console.log('service worker registered')
+        }).catch(error => {
+            console.log(error);
+        });
+}
+</script>
+{{ end }}
