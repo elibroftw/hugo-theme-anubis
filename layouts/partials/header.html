@@ -1,11 +1,18 @@
+{{ $style := "dark-without-switcher" }}
+{{ if and (isset site.Params "style") (ne site.Params.style "") }}
+    {{ $style = site.Params.style | lower }}
+{{ end }}
+
 <div class="header-top">
+    {{ partial "site-title.html" . -}}
+    {{- if not (in (slice "light-without-switcher" "dark-without-switcher" "auto-without-switcher") $style) }}
     <div class="header-top-left">
-        {{ partial "site-title.html" . }}
-        {{ partial "social.html" . }}
+    {{ end }}
+        {{- partial "social.html" . -}}
+        {{- if not (in (slice "light-without-switcher" "dark-without-switcher" "auto-without-switcher") $style) -}}
     </div>
-    <div class="header-top-right">
-        {{ partial "theme-switcher.html" . }}  
-    </div>
+    {{ end }}
+    {{- partial "theme-switcher.html" . -}}
 </div>
 
 {{ if .Site.Menus.main }}

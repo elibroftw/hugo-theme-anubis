@@ -1,11 +1,11 @@
-{{ $style := "light-without-switcher" }}
+{{ $style := "dark-without-switcher" }}
 {{ if and (isset site.Params "style") (ne site.Params.style "") }}
     {{ $style = site.Params.style | lower }}
 {{ end }}
 
 {{ if not (in (slice "light-without-switcher" "dark-without-switcher") $style) }}
 {{ if ne "auto-without-switcher" $style }}
-    <div class="theme-switcher">
+    <div class="header-top-right theme-switcher">
         {{ partial "font-awesome.html" (dict "iconName" "halfcircle" "custom" false) }}
     </div>
 {{ end }}
@@ -26,9 +26,11 @@ const autoChangeScheme = e => {
 document.addEventListener('DOMContentLoaded', function() {
     switchButton = document.querySelector('.theme-switcher')
     currentTheme = detectCurrentScheme()
+    setThemeColorMeta(currentTheme)
     if (currentTheme == 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark')
     }
+
     if (currentTheme == 'auto') {
         autoChangeScheme(autoDefinedScheme);
         autoDefinedScheme.addListener(autoChangeScheme);
@@ -37,24 +39,22 @@ document.addEventListener('DOMContentLoaded', function() {
     if (switchButton) {
         switchButton.addEventListener('click', switchTheme, false)
     }
-  
-    showContent()
 })
 
 function detectCurrentScheme() {
     if (localStorage !== null && localStorage.getItem(STORAGE_KEY)) {
         return localStorage.getItem(STORAGE_KEY)
-    } 
+    }
     if (defaultTheme) {
         return defaultTheme
-    } 
+    }
     if (!window.matchMedia) {
-        return 'light'
-    } 
+        return defaultTheme
+    }
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
         return 'dark'
     }
-    return 'light'
+    return defaultTheme
 }
 
 function switchTheme(e) {
@@ -69,11 +69,15 @@ function switchTheme(e) {
         document.documentElement.setAttribute('data-theme', 'dark')
         currentTheme = 'dark'
     }
+    setThemeColorMeta(currentTheme)
 }
 
-function showContent() {
-    document.body.style.visibility = 'visible';
-    document.body.style.opacity = 1;
+function setThemeColorMeta(currentTheme) {
+    if (currentTheme == 'dark') {
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#121212')
+    } else {
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fff')
+    }
 }
 </script>
 {{ end }}

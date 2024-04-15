@@ -1,7 +1,7 @@
 {{ $light := resources.Get "css/light.css" }}
 {{ $dark := resources.Get "css/dark.css" }}
 
-{{ $style := "light-without-switcher" }}
+{{ $style := "dark-without-switcher" }}
 {{ if and (isset site.Params "style") (ne site.Params.style "") }}
     {{ $style = site.Params.style | lower }}
 {{ end }}
@@ -11,20 +11,31 @@
     {{ $dark.Content }}
 }
 
-{{ else }}
+{{ else if eq $style "light-without-switcher" }}
 
 {{ $light.Content }}
 
-{{ if eq $style "auto-without-switcher" }}
-@media (prefers-color-scheme: dark) {
-    :root {
-        {{ $dark.Content }}
-    }
-}
-{{ else if ne $style "light-without-switcher" }}
-[data-theme="dark"] {
+{{ else if eq $style "auto-without-switcher" }}
+
+:root {
     {{ $dark.Content }}
 }
+
+@media (prefers-color-scheme: light) {
+    {{ $light.Content }}
+}
+
+{{ else }}
+
+:root {
+    {{ $dark.Content }}
+}
+
+{{ if ne $style "dark-without-switcher" }}
+[data-theme="light"] {
+    {{ $light.Content }}
+}
+
 {{ end }}
 
 {{ end }}
@@ -226,7 +237,6 @@ header h2 {
     align-items: center;
     justify-content: space-between;
     vertical-align: middle;
-    margin-top: 1em;
 }
 
 .site-title {
@@ -247,10 +257,13 @@ header nav a {
     margin: 0 2.5%;
 }
 
-/* Social icons */
 .social-icons {
-    display: inline;
-    margin: 1em 0 0 3em;
+    margin: 1em 2em 0 0;
+    {{ if in (slice "light-without-switcher" "dark-without-switcher" "auto-without-switcher") $style }}
+    margin-right: 0;
+    {{ else }}
+    margin-right: 2em;
+    {{ end }}
     padding: 0;
     list-style-type: none;
 }
@@ -693,6 +706,7 @@ ul.language-select > li, ul.footer-menu > li {
 
 .theme-switcher {
     cursor: pointer;
+    margin-top: 1em;
 }
 
 .theme-switcher-svg {
