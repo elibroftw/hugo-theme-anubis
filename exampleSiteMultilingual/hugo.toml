@@ -32,14 +32,14 @@ utterancesRepo = ""  # mandatory
 utterancesTheme = "" # optional
 utterancesIssue = "" # optional
 utterancesLabel = "" # optional
-  
+
 [[params.social]]
 id = "docs"
 url = "https://gohugo.io/documentation/"
 
 [[params.social]]
 id = "github"
-url = "https://github.com/mitrichius/hugo-theme-anubis"
+url = "https://github.com/elibroftw/hugo-theme-anubis"
 
 [languages.en]
 languageName = "English"

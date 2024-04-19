@@ -1,3 +1,3 @@
-module github.com/Mitrichius/hugo-theme-anubis
+module github.com/elibroftw/hugo-theme-anubis
 
 go 1.18
