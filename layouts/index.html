@@ -4,9 +4,11 @@
     </div>
 
     <div class="articles h-feed">
-        {{- $pages := where (where site.RegularPages "Type" "in" site.Params.mainSections) "Params.hidden" "!=" true -}}
+        {{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections -}}
         {{- range (.Paginate $pages).Pages -}}
-        {{- partial "post-summary.html" . -}}
+            {{ if not .Params.hidden }}
+                {{- partial "post-summary.html" . -}}
+            {{ end }}
         {{- end -}}
         {{- partial "pagination.html" . -}}
     </div>
