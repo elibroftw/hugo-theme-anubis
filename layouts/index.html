@@ -6,7 +6,7 @@
     <div class="articles h-feed">
         {{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections -}}
         {{- range (.Paginate $pages).Pages -}}
-            {{ if or (not .Params.hidden)  .Site.IsServer }}
+            {{ if or (not .Params.hidden)  hugo.IsServer }}
                 {{- partial "post-summary.html" . -}}
             {{ end }}
         {{- end -}}
