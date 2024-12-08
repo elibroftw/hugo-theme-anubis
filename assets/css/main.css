@@ -75,7 +75,7 @@ section {
 }
 
 .container {
-    max-width: 42em;
+    max-width:  calc(min(70em, 90%));
     margin: 0 auto;
 }
 
