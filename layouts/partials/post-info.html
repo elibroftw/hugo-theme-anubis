@@ -4,11 +4,20 @@
 {{- end }}
 {{- $machineDateFormat := "2006-01-02" -}}
 <div class="post-info">
+    {{ if .Params.authors }}
+            <ul class="post-authors">
+                {{ range $author_name := .Params.authors }}
+                    {{ $author := ($.Site.GetPage (printf "/authors/%s" $author_name | urlize )) }}
+                    <li><a href="{{ $author.Permalink }}">@{{ $author_name }}</a></li>
+                {{ end }}
+            </ul>
+    {{ end }}
+
     {{ if .Params.date }}
         <div class="post-date dt-published">
-            <a class="u-url" href="{{ .RelPermalink }}"><time datetime="{{ .Params.date.Format $machineDateFormat }}">
+            <span class="u-url" href="{{ .RelPermalink }}"><time datetime="{{ .Params.date.Format $machineDateFormat }}">
                 {{- .Params.date.Format $dateFormat -}}
-            </time></a>
+            </time></span>
             {{ if ne .Params.date .Params.lastMod -}}
                 [{{ i18n "lastMod" }} <time datetime="{{ .Params.lastMod.Format $machineDateFormat }}">
                     {{- .Params.lastMod.Format $dateFormat -}}
@@ -32,14 +41,6 @@
                 {{ range $tag_name := .Params.tags }}
                     {{ $tag := ($.Site.GetPage (printf "/tags/%s" $tag_name | urlize )) }}
                     <li><a href="{{ $tag.Permalink }}">#{{ $tag.Title | default $tag_name }}</a></li>
-                {{ end }}
-            </ul>
-        {{ end }}
-        {{ if .Params.authors }}
-            <ul class="post-authors">
-                {{ range $author_name := .Params.authors }}
-                    {{ $author := ($.Site.GetPage (printf "/authors/%s" $author_name | urlize )) }}
-                    <li><a href="{{ $author.Permalink }}">@{{ $author_name }}</a></li>
                 {{ end }}
             </ul>
         {{ end }}

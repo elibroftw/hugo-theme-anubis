@@ -10,16 +10,26 @@
     <article class="post h-entry">
         <div class="post-header">
             <header>
-                <h1 class="p-name post-title{{ if .Params.favorite }} favorite{{end}}{{ if .Params.draft }} draft{{end}}">{{ trim .Title  " " | markdownify }}</h1>
-
+                <h1 class="p-name post-title{{ if .Params.favorite }} favorite{{end}}{{ if .Params.draft }} draft{{end}}">{{ if .Params.authorPage }}Author -{{ end }} {{ trim .Title  " " | markdownify }}</h1>
                 {{ partial "post-language-switcher.html" . }}
             </header>
         </div>
+        <!-- don't want to show the default author always in post-info -->
+        {{  if and (.Site.Params.author) (not .Params.authors) (not .Params.authorPage) }}
+            {{ $author_name := .Site.Params.author }}
+            {{ $author := ($.Site.GetPage (printf "/authors/%s" $author_name | urlize )) }}
+            <div class="post-info">
+                <ul class="post-authors">
+                    <a href="{{ $author.Permalink }}">@{{ $author_name }}</a>
+                </ul>
+            </div>
+        {{ end }}
+
+        {{ partial "post-info.html" . }}
         {{ partial "toc.html" .}}
         <div class="content e-content">
             {{ .Content }}
         </div>
-        {{ partial "post-info.html" . }}
     </article>
 
     {{ if gt .Site.Params.readNextPosts 0 }}

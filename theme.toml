@@ -23,3 +23,7 @@ features = ["blog"]
 [author]
     name = "Dmitry Kolosov"
     homepage = "https://mitrich.me/en/"
+
+[taxonomies]
+  author = "authors"
+  tag = "tags"
