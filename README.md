@@ -99,7 +99,7 @@ params:
   description: ""
   # Uncomment if you need this
   # images:
-  #   - images/og-featured.png # relative path to "static" directory
+  #   - images/og-featured.png # relative path to "static" directory, this will be shown in Twitter cards
   # customCSS:
   #   - css/my.css # relative path to "assets" directory (don't use main.css filename)
   # customJS:
