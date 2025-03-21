@@ -306,7 +306,7 @@ Based on `readNextPosts` config parameter. Check [this article](https://gohugo.i
 
 ### Hiding posts from RSS
 
-Add `disable_feed: true` to post front matter.
+Add `disableFeed: true` to post front matter.
 
 ### Make post available only by link
 
