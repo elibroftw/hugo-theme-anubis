@@ -96,6 +96,10 @@ h3 {
     font-size: 1.1em;
 }
 
+h1, h2, h3 {
+  scroll-margin-top: 0.9em;
+}
+
 /* Links */
 
 a {
