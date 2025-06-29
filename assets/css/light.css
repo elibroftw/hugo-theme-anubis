@@ -1,9 +1,11 @@
 /* light.css */
 --font-color: #333;
 --bg-color: #fff;
+--article-bg-color: #f9f9f9;
+--article-bg-color-hover: #0080b517;
 
---link-color:#1d60a3;
---link-state-color:#a31d1d;
+--link-color: #1d60a3;
+--link-state-color: #a31d1d;
 --link-state-border-color: rgba(163, 29, 29, .5);
 
 --thead-bg-color: lightgrey;

@@ -1,4 +1,5 @@
 <article class="post-list h-feed">
+    <a href="{{ .RelPermalink }}" class="post-list-link"></a>
     <div class="post-header">
         <header>
             <h1 class="p-name post-title{{ if .Params.favorite }} favorite{{end}}{{ if .Params.draft }} draft{{end}}"><a class="u-url" href="{{ .RelPermalink }}">{{ trim .Title " " | markdownify }}</a></h1>
