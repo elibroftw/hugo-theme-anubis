@@ -51,21 +51,27 @@
     {{ if isset .Site.Params.webmentions "url"  }}
         <link rel="webmention" href="{{.Site.Params.webmentions.url}}" />
     {{ end }}
-{{ end }}
+{{ end -}}
 
+{{/*
 <!-- Article tags -->
 <!-- <meta property="article:published_time" content="">
 <meta property="article:modified_time" content="">
 <meta property="article:tag" content="">
 <meta property="article:publisher" content="https://www.facebook.com/XXX"> -->
+*/}}
 
-{{ if and (.Site.Config.Services.GoogleAnalytics) (hugo.IsProduction) }}
+{{- if and (.Site.Config.Services.GoogleAnalytics) (hugo.IsProduction) }}
     {{ template "_internal/google_analytics.html" . }}
-{{ end }}
+{{- end }}
 
-{{ if (.Site.Params.UmamiAnalytics.enabled ) }}
+{{- if (.Site.Params.UmamiAnalytics.enabled ) }}
     {{ partial "umami_analytics.html" . }}
-{{ end }}
+{{- end }}
 
-{{ partial "head-extra.html" . }}
+{{- if (.Site.Params.rybbitAnalytics ) }}
+    <script src="{{ .Site.Params.rybbitAnalytics }}" data-site-id="1" defer></script>
+{{- end }}
+
+{{- partial "head-extra.html" . }}
 </head>

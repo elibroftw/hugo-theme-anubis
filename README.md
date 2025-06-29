@@ -97,6 +97,7 @@ params:
   email: mail@example.org # used for microformats
   avatar: "/images/me.png" # used for microformats
   description: ""
+  # rybbitAnalytics: "https://ryb.domain.ca/api/script.js"
   # Uncomment if you need this
   # images:
   #   - images/og-featured.png # relative path to "static" directory, this will be shown in Twitter cards
