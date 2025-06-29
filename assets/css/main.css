@@ -326,6 +326,29 @@ main h1 {
 
 /* Articles */
 
+.post-list-link {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  text-decoration: none;
+}
+
+.post-list {
+    position: relative;
+    background-color: var(--article-bg-color);
+    margin: 1rem;
+    padding: 0.25rem 1rem 1rem;;
+    border-radius: 10px;
+    transition: transform 0.1s ease-in-out;
+}
+
+.post-list:hover {
+    background-color: var(--article-bg-color-hover);
+    transform: scale(1.015);
+}
+
 .post-header {
     margin-top: 1em;
     line-height: 1.1em;
@@ -383,7 +406,6 @@ main h1 {
 
 article:not(:last-of-type) {
     border-bottom: thin solid var(--hr-color);
-    padding-bottom: 2em;
 }
 
 article header h1 {
@@ -515,6 +537,11 @@ article header h1 a {
     white-space: nowrap;
 }
 
+.post-date a {
+    top: auto;
+    position: relative;
+}
+
 .post-categories {
     display: inline;
     list-style-type: none;
@@ -524,6 +551,11 @@ article header h1 a {
 .post-categories li {
     display: inline;
     margin-right: 1em;
+}
+
+.post-tags {
+    top: auto;
+    position: relative;
 }
 
 .post-tags {
