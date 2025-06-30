@@ -344,9 +344,11 @@ main h1 {
     transition: transform 0.1s ease-in-out;
 }
 
-.post-list:hover {
-    background-color: var(--article-bg-color-hover);
-    transform: scale(1.015);
+@media(hover: hover) {
+    .post-list:hover {
+        background-color: var(--article-bg-color-hover);
+        transform: scale(1.015);
+    }
 }
 
 .post-header {
@@ -817,6 +819,10 @@ ul.language-select > li, ul.footer-menu > li {
         max-width: 90%;
         margin: 0 auto;
         word-wrap: break-word;
+    }
+
+    .post-list {
+        margin: 1rem 0rem;
     }
 
     .pagination-item {
