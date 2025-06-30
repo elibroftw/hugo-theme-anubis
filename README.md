@@ -8,6 +8,7 @@ Anubis is a simple minimalist theme for [Hugo blog engine](https://gohugo.io/).
 ## Features
 
 - Dark mode (automatic or by switcher)
+- Knowledge Graph. Just add `({{< blog-graph >}}` to `content/graph.md` and then add the page to you `hugo.yaml` file
 - Offline support via Progressive Web App
   - You must create `manifest.json` in your static directory
   - You must create `index.sw.js` in your layouts directory
