@@ -1,6 +1,13 @@
 {{ $graphId := default "hugo-blog-graph" (.Get "id") }}
 <div class="blog-graph-container" id="container-{{ $graphId }}">
-    <div class="blog-graph" id="{{ $graphId }}"></div>
+    <div class="blog-graph" id="{{ $graphId }}">
+      <div id="external-link-icon" title="Open tag page">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z" />
+        </svg>
+        </div>
+    </div>
 </div>
 <style>
   .blog-graph-container {
@@ -8,12 +15,17 @@
       width: 100%;
       margin: 20px 0;
       border-radius: 8px;
+      display: flex;
+      justify-content: center;
   }
 
   .blog-graph {
-      width: 100%;
+      width: 90%;
+      max-width: 800px;
+      max-height: 70vh;
       height: 800px;
       aspect-ratio: 1;
+      border: 1px solid #888888;
       border-radius: 16px;
       background-color: var(--bg-color);
       overflow: hidden;
@@ -65,6 +77,32 @@
       overflow: hidden;
       text-overflow: ellipsis;
   }
+
+  #external-link-icon {
+      position: relative;
+      top: 10px;
+      left: calc(100% - 40px);
+      margin-bottom: -32px;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      z-index: 10000;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 4px;
+      padding: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      display: none;
+  }
+
+  #external-link-icon:hover {
+      background-color: rgba(255, 255, 255, 1);
+  }
+
+  #external-link-icon svg {
+      width: 100%;
+      height: 100%;
+      fill: #333;
+  }
 </style>
 <script>
   (function () {
@@ -74,6 +112,7 @@
     let svg;
     let g; // Global group element
     let currentZoomScale = 1; // Track current zoom level
+    let highlightedNode = null; // Track currently highlighted node
     const zoomThreshold = 1.5; // Zoom level at which to show labels
     const graphId = "{{ $graphId }}";
     const graphElement = document.getElementById(graphId);
@@ -109,9 +148,12 @@
       const height = graphElement.clientHeight;
 
       // Clear any existing SVG
-      if (graphElement.querySelector("svg")) {
-        graphElement.querySelector("svg").remove();
+      if (graphElement.firstElementChild && graphElement.firstElementChild.tagName.toLowerCase() === 'svg') {
+        graphElement.firstElementChild.remove();
       }
+
+      // Create external link icon
+      const externalLinkIcon = document.getElementById("external-link-icon");
 
       // Create SVG element
       svg = d3
@@ -226,16 +268,25 @@
         .style("cursor", "pointer")
         .call(drag(simulation))
         .on("click", (event, d) => {
-          handleNodeClick(d);
-
-          // Open link in new tab when clicked (for both post and tag nodes)
-          if (!d.isTag && (d.link || d.permalink)) {
-            window.open(d.link || d.permalink, "_blank");
-          } else if (d.isTag) {
-                const tagName = d.title.replace(/\s+/g, "-");
-                const tagPermalink = `/tags/${tagName.toLowerCase()}`;
-                window.open(tagPermalink, "_blank");
+          if (!d.isTag) {
+            // Post nodes: open link directly
+            if (d.link || d.permalink) {
+              window.open(d.link || d.permalink, "_blank");
+            }
+          } else {
+            // Tag nodes: toggle highlighting
+            if (highlightedNode && highlightedNode.id === d.id) {
+              highlightedNode = null;
+              resetHighlighting();
+            } else {
+              // Clear previous highlight
+              if (highlightedNode) {
+                resetHighlighting();
               }
+              highlightedNode = d;
+              highlightConnections(d);
+            }
+          }
         })
         .on("mouseover", (event, d) => {
           // Show tooltip instantly on hover
@@ -243,7 +294,11 @@
             ? `Tag: ${d.title} (${d.connections} posts)`
             : d.title;
           showTooltip(tooltipText, event.pageX, event.pageY);
-          highlightConnections(d);
+
+          // Only highlight on mouseover if no node is currently highlighted
+          if (!highlightedNode) {
+            highlightConnections(d);
+          }
         })
         .on("mousemove", (event) => {
           // Move tooltip with cursor
@@ -252,7 +307,10 @@
         .on("mouseout", () => {
           // Hide tooltip when not hovering
           hideTooltip();
-          resetHighlighting();
+          // Only reset highlighting if no node is currently highlighted
+          if (!highlightedNode) {
+            resetHighlighting();
+          }
         });
 
       // Draw node circles
@@ -475,6 +533,15 @@
               connectedNodes.push(l.target.id || l.target);
             }
           });
+
+          // Show external link icon for tag nodes
+          externalLinkIcon.style.display = "block";
+          // Set click handler for external link icon
+          externalLinkIcon.onclick = function() {
+            const tagName = d.title.replace(/\s+/g, "-");
+            const tagPermalink = `/tags/${tagName.toLowerCase()}`;
+            window.open(tagPermalink, "_blank");
+          };
         } else {
           // For post nodes: find all tags connected to this post and use their colors
           link.each(function (l) {
@@ -508,6 +575,8 @@
           .style("opacity", 0.6)
           .attr("stroke", "#888888")
           .attr("stroke-width", 1);
+        // Hide external link icon
+        externalLinkIcon.style.display = "none";
       }
 
       // Update positions on tick
