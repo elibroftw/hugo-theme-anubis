@@ -8,6 +8,7 @@ Anubis is a simple minimalist theme for [Hugo blog engine](https://gohugo.io/).
 ## Features
 
 - Dark mode (automatic or by switcher)
+- Client-side search ([read this](#search))
 - Knowledge Graph. Just add `({{< blog-graph >}}` to `content/graph.md` and then add the page to you `hugo.yaml` file
 - Offline support via Progressive Web App
   - You must create `manifest.json` in your static directory
@@ -118,6 +119,7 @@ params:
   tocWordCount: 300 # ...when a post is longer than 300 words
   copyCodeButton: true # true by default
   rssAsSocialIcon: true
+  search: true # enable client-side search, see the "Search" section under Feature Settings
   mathjax: false # https://www.mathjax.org/
   # utteranc.es support
   utterancesRepo: ""  # mandatory
@@ -197,6 +199,85 @@ Options:
 - `light` - light theme by default, can be switched by user to dark theme and back. Theme settings are saved for user
 - `dark` - dark theme by default, can be switched by user to light theme and back. Theme settings are saved for user
 - `auto` - theme based on user system settings by default, can be switched by user to dark/light theme. Theme settings are saved for user (by default in example sites)
+
+### Search
+
+Anubis ships with client-side search — no server, API or third-party service
+required. It works on any static host (GitHub Pages, Netlify, Cloudflare
+Pages, …).
+
+What you get:
+
+- A search box in the header, between the social icons and the theme
+  switcher (on its own full-width row on small screens). Pressing `/`
+  anywhere on a page focuses it; pressing `Enter` opens the search page.
+- A search page with live results as you type: ranked multi-word matching
+  across titles, tags, summaries and full post content, highlighted snippets,
+  dates and tags, and shareable `/search/?q=...` URLs.
+
+To enable it, three steps:
+
+1. Turn it on in the `params` section of your config:
+
+    ```yaml
+    params:
+      search: true
+    ```
+
+2. Create the search page with the bundled archetype. This creates
+   `content/search.md` with the right `layout: search`; the page is hidden
+   from lists and feeds. Any content you add to it renders above the search
+   box.
+
+    ```sh
+    hugo new search.md
+    ```
+
+3. Add the `SearchIndex` output format to your config. This makes Hugo
+   generate the search index, `searchindex.json`, at build time:
+
+    ```yaml
+    outputFormats:
+      SearchIndex:
+        mediaType: application/json
+        baseName: searchindex
+        isPlainText: true
+        notAlternative: true
+
+    outputs:
+      home:
+        - HTML
+        - RSS
+        - SearchIndex
+    ```
+
+Optionally:
+
+- Add a link to the search page to the menu:
+
+    ```yaml
+    menu:
+      main:
+      - identifier: search
+        name: Search
+        title: Search
+        url: /search/
+        weight: 0
+    ```
+
+- If you use the PWA/offline support, add `/search/` and `searchindex.json`
+  to your service worker's precache list so search works offline too.
+
+How it works: at build time Hugo writes `/searchindex.json` containing the
+title, URL, date, tags, summary and full plain-text content of every post
+in your `mainSections` (hidden and author pages are excluded). The search
+page fetches the index once in the browser; all matching, ranking and
+rendering happen client-side. The index grows with your content, but most
+static hosts serve it gzipped and the browser caches it after the first
+visit.
+
+All user-facing strings (placeholder, result counts, error messages) are
+translatable — see the `search*` keys in `i18n/`.
 
 ### Table of Contents
 

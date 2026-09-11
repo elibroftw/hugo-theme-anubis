@@ -859,3 +859,97 @@ ul.language-select > li, ul.footer-menu > li {
     z-index: 1;
   }
 {{ end }}
+
+/* Search */
+
+.header-search {
+    display: flex;
+    flex: 0 1 14em;
+    min-width: 7em;
+    margin: 1em 1em 0;
+}
+
+.header-search input {
+    width: 100%;
+    padding: 0.3em 0.75em;
+    font-family: inherit;
+    font-size: 0.95em;
+    color: var(--font-color);
+    background-color: var(--bg-color);
+    border: 1px solid var(--bq-color);
+    border-radius: 8px;
+}
+
+.header-search input:focus {
+    outline: none;
+    border-color: var(--font-color);
+}
+
+/* On small screens, the search box moves to its own row
+   between the social icons and the nav menu */
+@media (max-width: 840px) {
+    .header-search {
+        order: 10;
+        flex: 1 1 100%;
+        margin: 0.75em 0 0;
+    }
+}
+
+.search-box {
+    margin: 2rem 0 1rem;
+}
+
+#search-input {
+    width: 100%;
+    padding: 0.6em 1em;
+    font-size: 1.1em;
+    font-family: inherit;
+    color: var(--font-color);
+    background-color: var(--bg-color);
+    border: 1px solid var(--bq-color);
+    border-radius: 8px;
+}
+
+#search-input:focus {
+    outline: none;
+    border-color: var(--font-color);
+}
+
+.search-results-info {
+    margin: 0.5rem 0 1.5rem;
+    color: var(--post-info-color);
+}
+
+.search-result {
+    margin-bottom: 1.5rem;
+}
+
+/* Undo the hidden heading anchor links (.post h2 a { opacity: 0; position: absolute })
+   so search result titles are visible */
+.search-result .post-title a {
+    opacity: 1;
+    position: static;
+    left: auto;
+    color: var(--font-color);
+    border: none;
+    text-decoration: none;
+}
+
+/* Keep tags/date above the whole-card click overlay */
+.search-result .post-info {
+    position: relative;
+    z-index: 1;
+}
+
+.search-result mark,
+.post-title mark {
+    background-color: var(--article-bg-color-hover);
+    color: inherit;
+    border-radius: 2px;
+}
+
+@media print {
+    .header-search {
+        display: none;
+    }
+}

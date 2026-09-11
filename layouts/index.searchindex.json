@@ -1,0 +1,16 @@
+{{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections -}}
+{{- $pages = where $pages "Params.hidden" "!=" true -}}
+{{- $pages = where $pages "Params.authorPage" "!=" true -}}
+[
+{{- range $i, $p := $pages }}
+{{- if gt $i 0 }},{{ end }}
+{
+    "title": {{ $p.Title | jsonify }},
+    "url": {{ $p.RelPermalink | jsonify }},
+    "date": {{ time.Format "2006-01-02" $p.Date | jsonify }},
+    "tags": {{ $p.Params.tags | default slice | jsonify }},
+    "summary": {{ $p.Params.summary | default ($p.Summary | plainify) | jsonify }},
+    "content": {{ $p.Plain | jsonify }}
+}
+{{- end }}
+]

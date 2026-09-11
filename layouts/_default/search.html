@@ -1,0 +1,243 @@
+{{ define "main" }}
+{{ $indexUrl := relLangURL "searchindex.json" }}
+<article class="post h-entry">
+    <div class="post-header">
+        <header>
+            <h1 class="p-name post-title">{{ trim .Title " " | markdownify }}</h1>
+        </header>
+    </div>
+    <div class="content e-content">
+        {{ .Content }}
+        <div class="search-box">
+            <input id="search-input" type="search" placeholder="{{ i18n "searchPlaceholder" }}" aria-label="{{ i18n "search" }}" autocomplete="off" spellcheck="false" autofocus />
+        </div>
+        <div id="search-results-info" class="search-results-info" aria-live="polite"></div>
+        <div id="search-results" class="search-results"></div>
+    </div>
+</article>
+
+<script>
+(function () {
+    "use strict";
+    var INDEX_URL = {{ $indexUrl }};
+    var STR = {
+        loading: {{ i18n "searchLoading" }},
+        failed: {{ i18n "searchFailed" }},
+        noResults: {{ i18n "searchNoResults" }},
+        resultOne: {{ i18n "searchResultOne" }},
+        resultMany: {{ i18n "searchResultMany" }},
+        resultTruncated: {{ i18n "searchResultTruncated" }}
+    };
+    var MAX_RESULTS = 20;
+    var SNIPPET_BEFORE = 80;
+    var SNIPPET_AFTER = 220;
+    var DEBOUNCE_MS = 150;
+
+    var input = document.getElementById("search-input");
+    var resultsEl = document.getElementById("search-results");
+    var infoEl = document.getElementById("search-results-info");
+    var entries = null;
+    var debounceTimer = null;
+
+    function norm(s) {
+        return (s || "").toLowerCase();
+    }
+
+    function fmt(s, map) {
+        return s.replace(/__(\w+)__/g, function (m, k) {
+            k = k.toLowerCase();
+            return map[k] !== undefined ? String(map[k]) : m;
+        });
+    }
+
+    function queryWords(q) {
+        return norm(q).split(/[\s,;]+/).filter(function (w) { return w.length > 0; });
+    }
+
+    function loadIndex(callback) {
+        if (entries !== null) {
+            callback();
+            return;
+        }
+        infoEl.textContent = STR.loading;
+        fetch(INDEX_URL).then(function (res) {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+        }).then(function (pages) {
+            entries = [];
+            for (var i = 0; i < pages.length; i++) {
+                var p = pages[i];
+                var tags = Array.isArray(p.tags) ? p.tags : (p.tags ? [p.tags] : []);
+                var titleLower = norm(p.title);
+                var tagsLower = tags.map(norm).join(" ");
+                var summaryLower = norm(p.summary);
+                var contentLower = norm(p.content);
+                entries.push({
+                    p: p,
+                    titleLower: titleLower,
+                    tagsLower: tagsLower,
+                    summaryLower: summaryLower,
+                    contentLower: contentLower,
+                    allLower: titleLower + "\n" + tagsLower + "\n" + summaryLower + "\n" + contentLower
+                });
+            }
+            callback();
+        }).catch(function () {
+            infoEl.textContent = STR.failed;
+        });
+    }
+
+    function search(words) {
+        var results = [];
+        for (var i = 0; i < entries.length; i++) {
+            var e = entries[i];
+            var total = 0;
+            var matched = true;
+            for (var j = 0; j < words.length; j++) {
+                var w = words[j];
+                var score = 0;
+                if (e.titleLower.indexOf(w) !== -1) score += 20;
+                if (e.tagsLower.indexOf(w) !== -1) score += 10;
+                if (e.summaryLower.indexOf(w) !== -1) score += 5;
+                if (e.contentLower.indexOf(w) !== -1) score += 1;
+                if (score === 0) {
+                    matched = false;
+                    break;
+                }
+                total += score;
+            }
+            if (matched) {
+                results.push({ entry: e, score: total });
+            }
+        }
+        results.sort(function (a, b) { return b.score - a.score; });
+        return results;
+    }
+
+    function escapeHtml(s) {
+        return s.replace(/[&<>"']/g, function (c) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+    }
+
+    function escapeRegex(s) {
+        return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    function highlight(text, words) {
+        var pattern = words.map(escapeRegex).join("|");
+        return escapeHtml(text).replace(new RegExp("(" + pattern + ")", "gi"), "<mark>$1</mark>");
+    }
+
+    function snippet(content, words) {
+        if (!content) return "";
+        var lower = norm(content);
+        var idx = -1;
+        for (var i = 0; i < words.length; i++) {
+            idx = lower.indexOf(words[i]);
+            if (idx !== -1) break;
+        }
+        var start, end;
+        if (idx === -1) {
+            start = 0;
+            end = Math.min(content.length, SNIPPET_BEFORE + SNIPPET_AFTER);
+        } else {
+            start = Math.max(0, idx - SNIPPET_BEFORE);
+            end = Math.min(content.length, idx + SNIPPET_AFTER);
+        }
+        var s = content.slice(start, end).replace(/\s+/g, " ").trim();
+        if (start > 0) s = "… " + s;
+        if (end < content.length) s += " …";
+        return s;
+    }
+
+    function tagUrl(tag) {
+        return "/tags/" + encodeURIComponent(norm(tag).replace(/\s+/g, "-")) + "/";
+    }
+
+    function resultsInfo(query, n) {
+        if (n === 0) {
+            return fmt(STR.noResults, { query: query });
+        }
+        if (n === 1) {
+            return fmt(STR.resultOne, { query: query });
+        }
+        if (n > MAX_RESULTS) {
+            return fmt(STR.resultTruncated, { query: query, count: n, shown: MAX_RESULTS });
+        }
+        return fmt(STR.resultMany, { query: query, count: n });
+    }
+
+    function render(query, results) {
+        resultsEl.innerHTML = "";
+        if (!query) {
+            infoEl.textContent = "";
+            return;
+        }
+        infoEl.textContent = resultsInfo(query, results.length);
+        var shown = results.slice(0, MAX_RESULTS);
+        for (var i = 0; i < shown.length; i++) {
+            var e = shown[i].entry;
+            var p = e.p;
+            var words = queryWords(query);
+            var html = '<article class="post-list h-entry search-result">'
+                + '<a class="post-list-link" href="' + escapeHtml(p.url) + '"></a>'
+                + '<div class="post-header"><header>'
+                + '<h2 class="p-name post-title"><a class="u-url" href="' + escapeHtml(p.url) + '">' + highlight(p.title, words) + '</a></h2>'
+                + '</header></div>';
+            var allInSummary = words.every(function (w) { return e.summaryLower.indexOf(w) !== -1; });
+            var source = allInSummary ? p.summary : p.content;
+            html += '<div class="content post-summary">' + highlight(snippet(source, words), words) + '</div>';
+            html += '<div class="post-info"><div class="post-date">' + escapeHtml(p.date) + '</div>';
+            if (p.tags && p.tags.length) {
+                html += '<ul class="post-tags">';
+                for (var t = 0; t < p.tags.length; t++) {
+                    html += '<li><a class="tag" href="' + tagUrl(p.tags[t]) + '">#' + highlight(p.tags[t], words) + '</a></li>';
+                }
+                html += '</ul>';
+            }
+            html += '</div>';
+            html += '</article>';
+            var el = document.createElement("div");
+            el.innerHTML = html;
+            resultsEl.appendChild(el.firstChild);
+        }
+    }
+
+    function runSearch(q, updateUrl) {
+        var query = (q || "").trim();
+        if (updateUrl) {
+            var url = new URL(window.location.href);
+            if (query) {
+                url.searchParams.set("q", query);
+            } else {
+                url.searchParams.delete("q");
+            }
+            window.history.replaceState(null, "", url);
+        }
+        loadIndex(function () {
+            var words = queryWords(query);
+            if (words.length === 0) {
+                render("", []);
+                return;
+            }
+            render(query, search(words));
+        });
+    }
+
+    input.addEventListener("input", function () {
+        clearTimeout(debounceTimer);
+        var value = input.value;
+        debounceTimer = setTimeout(function () {
+            runSearch(value, true);
+        }, DEBOUNCE_MS);
+    });
+
+    var initial = new URLSearchParams(window.location.search).get("q");
+    if (initial) {
+        input.value = initial;
+    }
+    runSearch(input.value, false);
+})();
+</script>
+{{ end }}

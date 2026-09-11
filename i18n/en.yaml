@@ -57,3 +57,27 @@ toOldPost:
 
 videoIsNotSupported:
   other: "Your browser does not support video"
+
+search:
+  other: "Search"
+
+searchPlaceholder:
+  other: "Search…"
+
+searchLoading:
+  other: "Loading search index…"
+
+searchFailed:
+  other: "Failed to load the search index. Please try again later."
+
+searchNoResults:
+  other: "No results found for “__QUERY__”."
+
+searchResultOne:
+  other: "1 result for “__QUERY__”."
+
+searchResultMany:
+  other: "__COUNT__ results for “__QUERY__”."
+
+searchResultTruncated:
+  other: "__COUNT__ results for “__QUERY__” (showing first __SHOWN__)."

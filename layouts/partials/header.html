@@ -12,6 +12,9 @@
         {{- if not (in (slice "light-without-switcher" "dark-without-switcher" "auto-without-switcher") $style) -}}
     </div>
     {{ end }}
+    {{- if site.Params.search -}}
+    {{- partial "header-search.html" . -}}
+    {{- end -}}
     {{- partial "theme-switcher.html" . -}}
 </div>
 

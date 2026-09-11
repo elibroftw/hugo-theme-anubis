@@ -21,6 +21,7 @@ readNextPosts = 2
 copyCodeButton = true
 rssAsSocialIcon = true
 mathjax = false
+search = true
 
 # Graphcomment support
 graphcommentId = ""
@@ -72,3 +73,14 @@ tag = "tags"
 
 [markup.goldmark.renderer]
 unsafe = true
+
+# Client-side search: generates /searchindex.json at build time.
+# Also needs `hugo new search.md` (see archetypes/search.md).
+[outputFormats.SearchIndex]
+mediaType = "application/json"
+baseName = "searchindex"
+isPlainText = true
+notAlternative = true
+
+[outputs]
+home = ["HTML", "RSS", "SearchIndex"]

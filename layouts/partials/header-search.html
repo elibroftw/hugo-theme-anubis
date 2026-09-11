@@ -1,0 +1,12 @@
+<form class="header-search" action="{{ relLangURL "search/" }}" method="get" role="search">
+    <input type="search" name="q" placeholder="{{ i18n "searchPlaceholder" }}" aria-label="{{ i18n "search" }}" autocomplete="off" spellcheck="false" />
+</form>
+<script>
+document.addEventListener('keydown', function (e) {
+    if (e.key === '/' && !/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || '')) {
+        e.preventDefault();
+        var input = document.querySelector('.header-search input');
+        if (input) input.focus();
+    }
+});
+</script>
