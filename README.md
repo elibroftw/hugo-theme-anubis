@@ -251,20 +251,6 @@ To enable it, three steps:
         - SearchIndex
     ```
 
-Optionally:
-
-- Add a link to the search page to the menu:
-
-    ```yaml
-    menu:
-      main:
-      - identifier: search
-        name: Search
-        title: Search
-        url: /search/
-        weight: 0
-    ```
-
 - If you use the PWA/offline support, add `/search/` and `searchindex.json`
   to your service worker's precache list so search works offline too.
 
